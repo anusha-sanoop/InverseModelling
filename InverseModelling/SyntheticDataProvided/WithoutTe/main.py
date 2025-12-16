@@ -14,6 +14,7 @@ from data_loader import read_surfer_grd, check_grid_compatibility
 from elastic_thickness_inversion import ElasticThicknessInversion
 from moving_window_analysis import MovingWindowAnalysis
 from visualization import plot_inversion_results, plot_te_map, plot_sensitivity
+import matplotlib.pyplot as plt
 
 
 def create_output_folder():
@@ -111,9 +112,11 @@ def main():
     print("  Computational domain: 2000 km")
     print(f"  Te search range: {Te_range[0]/1000:.0f}-{Te_range[1]/1000:.0f} km (AUTOMATIC)")
     
+    """
     print("\n" + "="*80)
     print("1. SINGLE WINDOW ANALYSIS (ENTIRE DOMAIN)")
     print("="*80)
+
     
     # Initialize inverter with Mars parameters
     inverter = ElasticThicknessInversion(dx=dx, dy=dy,
@@ -132,17 +135,19 @@ def main():
     print(f"  RMS Misfit: {result['rms_best']/1000:.2f} km")
     
     # Plot results
-    import matplotlib.pyplot as plt
     fig1 = plot_inversion_results(topography, moho_depth, result, X_topo, Y_topo)
     plt.show(block=False)
     
+    """
     # Moving window analysis
     print("\n" + "="*80)
     print("MOVING WINDOW ANALYSIS")
     print("="*80)
     
+    """
     use_moving_window = input("\nPerform moving window analysis? (y/n, default: y): ").lower()
     if use_moving_window != 'n':
+
         # Use specified parameters
         window_size = 1000000  # 1000 km
         shift_min = 20000      # 20 km
@@ -224,7 +229,74 @@ def main():
     else:
         mw_results = None
         mw_results_dict = None
+    """
+
+    # Use specified parameters
+    window_size = 1000000  # 1000 km
+    shift_min = 20000      # 20 km
+    shift_max = 80000      # 80 km
+    shift_step = 20000     # 20 km
+        
+    print(f"\nUsing parameters:")
+    print(f"  Window size: {window_size/1000:.0f} km")
+    print(f"  Shift distance range: {shift_min/1000:.0f}-{shift_max/1000:.0f} km (step: {shift_step/1000:.0f} km)")
+    print(f"  Te search range: {Te_range[0]/1000:.0f}-{Te_range[1]/1000:.0f} km (AUTOMATIC - no input required)")
+        
     
+        
+    mw_analyzer = MovingWindowAnalysis(dx=dx, dy=dy)
+     
+            # Perform analysis with multiple shift distances
+    mw_results_dict = mw_analyzer.analyze_multiple_shifts(
+                topography, moho_depth,
+                window_size=window_size,
+                shift_min=shift_min,
+                shift_max=shift_max,
+                shift_step=shift_step,
+                Te_range=Te_range  # Use automatically determined range
+            )
+            
+            # Use the first shift distance result for plotting
+    first_shift = list(mw_results_dict.keys())[0]
+    mw_results = mw_results_dict[first_shift]
+            
+            # Plot Te maps for different shift distances
+    n_shifts = len(mw_results_dict)
+    fig2, axes = plt.subplots(2, min(3, n_shifts), figsize=(5*min(3, n_shifts), 10), squeeze=False)
+            
+    shift_keys = list(mw_results_dict.keys())[:3]  # Show first 3
+            
+    for idx, shift_dist in enumerate(shift_keys):
+                if idx < axes.shape[1]:
+                    result = mw_results_dict[shift_dist]
+                    viridis_with_bad = plt.cm.get_cmap('viridis').copy()
+                    viridis_with_bad.set_bad('lightgray')
+                    
+                    x_centers_km = result['x_centers'] * dx / 1000
+                    y_centers_km = result['y_centers'] * dy / 1000
+                    extent_te = [x_centers_km.min(), x_centers_km.max(),
+                                 y_centers_km.min(), y_centers_km.max()]
+                    
+                    im1 = axes[0, idx].imshow(result['Te_map']/1000, extent=extent_te,
+                                             cmap=viridis_with_bad, origin='lower', aspect='equal')
+                    axes[0, idx].set_title(f'Te Map - Shift {shift_dist/1000:.0f} km')
+                    axes[0, idx].set_xlabel('X (km)')
+                    axes[0, idx].set_ylabel('Y (km)')
+                    plt.colorbar(im1, ax=axes[0, idx], label='Te (km)')
+                    
+                    im2 = axes[1, idx].imshow(result['rms_map']/1000, extent=extent_te,
+                                             cmap=viridis_with_bad, origin='lower', aspect='equal')
+                    axes[1, idx].set_title(f'RMS Map - Shift {shift_dist/1000:.0f} km')
+                    axes[1, idx].set_xlabel('X (km)')
+                    axes[1, idx].set_ylabel('Y (km)')
+                    plt.colorbar(im2, ax=axes[1, idx], label='RMS (km)')
+            
+    plt.tight_layout()
+    plt.show(block=False)
+    
+    mw_results_dict = None
+
+    """
     # Sensitivity analysis
     print("\n" + "="*80)
     print("SENSITIVITY ANALYSIS")
@@ -240,7 +312,7 @@ def main():
         
         fig3 = plot_sensitivity(Te_values, rms_values)
         plt.show(block=False)
-    
+    """
     # Save results
     print("\n" + "="*80)
     print("SAVING RESULTS")
@@ -255,8 +327,8 @@ def main():
             'moho_depth': moho_depth,
             'X': X_topo,
             'Y': Y_topo,
-            'Te_best': result['Te_best'],
-            'rms_best': result['rms_best'],
+           # 'Te_best': result['Te_best'],
+           # 'rms_best': result['rms_best'],
             'moho_predicted': result['moho_pred'],
             'Te_range_used': Te_range
         }
@@ -300,4 +372,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

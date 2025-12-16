@@ -13,6 +13,7 @@ from data_loader import read_surfer_grd, check_grid_compatibility
 from elastic_thickness_inversion import ElasticThicknessInversion
 from moving_window_analysis import MovingWindowAnalysis
 from visualization import plot_inversion_results, plot_te_map, plot_sensitivity
+import matplotlib.pyplot as plt
 
 
 def create_output_folder():
@@ -81,6 +82,7 @@ def main():
     print("  Shift distance range: 20-80 km")
     print("  Computational domain: 2000 km")
     
+    """
     # Single window analysis (entire domain)
     print("\n" + "="*80)
     print("1. SINGLE WINDOW ANALYSIS (ENTIRE DOMAIN)")
@@ -103,16 +105,17 @@ def main():
     print(f"  RMS Misfit: {result['rms_best']/1000:.2f} km")
     
     # Plot results
-    import matplotlib.pyplot as plt
     fig1 = plot_inversion_results(topography, moho_depth, result, X_topo, Y_topo)
     plt.show(block=False)
     
+    """
     # Moving window analysis
     print("\n" + "="*80)
     print("MOVING WINDOW ANALYSIS")
     print("="*80)
     
-    use_moving_window = input("\nPerform moving window analysis? (y/n, default: y): ").lower()
+   # use_moving_window = input("\nPerform moving window analysis? (y/n, default: y): ").lower()
+    use_moving_window = 'y'
     if use_moving_window != 'n':
         # Use specified parameters
         window_size = 1000000  # 1000 km
@@ -128,7 +131,8 @@ def main():
         print(f"  Te search range: {Te_min/1000:.0f}-{Te_max/1000:.0f} km")
         
         # Ask if multiple shifts or single shift
-        use_multiple_shifts = input("\nAnalyze multiple shift distances? (y/n, default: y): ").lower()
+       # use_multiple_shifts = input("\nAnalyze multiple shift distances? (y/n, default: y): ").lower()
+        use_multiple_shifts ='y'
         
         mw_analyzer = MovingWindowAnalysis(dx=dx, dy=dy)
         
