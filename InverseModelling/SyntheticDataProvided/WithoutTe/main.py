@@ -60,8 +60,8 @@ def determine_te_range(topography, moho_depth, dx, dy):
 
 def main():
     
-    topography_file = "Model3TwoMountainsFar_1Topo_S20km.grd"
-    moho_file = "Mohod_depth_add30km_final_S20km.grd"
+    topography_file = "D:\Marine\Project\InverseModelling\Test data_DRK\Large and small mount\MarsModel3TwoMountainsFar_1Topo_S20km.grd"
+    moho_file = "D:\Marine\Project\InverseModelling\Test data_DRK\Large and small mount\Mohod_depth_add30km_final_S20km.grd"
     
     if not os.path.exists(topography_file):
         print(f"\nERROR: Topography file not found: {topography_file}")
