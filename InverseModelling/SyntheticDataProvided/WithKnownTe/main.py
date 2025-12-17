@@ -29,9 +29,23 @@ def create_output_folder():
 
 def main():
     
-    topography_file = "D:\Marine\Project\InverseModelling\Test data_DRK\Large and small mount\MarsModel3TwoMountainsFar_1Topo_S20km.grd"
-    moho_file = "D:\Marine\Project\InverseModelling\Test data_DRK\Large and small mount\Mohod_depth_add30km_final_S20km.grd"
-    
+    option = int(input(f"Press \t1. Synthetic data  \t2. Real data: \t"))
+    if option == 1:
+        print("\n")
+        print("Synthetic Data")
+        print("."*15)
+        topography_file = "D:\\Marine\\Project\\InverseModelling\\Test data_DRK\\Large and small mount\\MarsModel3TwoMountainsFar_1Topo_S20km.grd"
+        moho_file = "D:\\Marine\\Project\\InverseModelling\\Test data_DRK\\Large and small mount\\Mohod_depth_add30km_final_S20km.grd"
+    elif option == 2:
+        print("\n")
+        print("Real Data")
+        print("."*10)
+        topography_file = "D:\\Marine\\Project\\InverseModelling\\Test data_DRK\\Real data\\Topo_proj.grd"
+        moho_file = "D:\\Marine\\Project\\InverseModelling\\Test data_DRK\\Real data\\Moho_Tc+Topo.grd"
+    else:
+        print("Invalid option selected. Exiting.")
+        return
+
     # Check if files exist
     if not os.path.exists(topography_file):
         print(f"\nERROR: Topography file not found: {topography_file}")
@@ -44,9 +58,8 @@ def main():
         return
     
     # Load data
-    print("\n" + "="*80)
-    print("LOADING DATA")
-    print("="*80)
+    print("\n")
+    print("LOADING DATA","."*50)
     
     X_topo, Y_topo, topography, dx_topo, dy_topo, nx_topo, ny_topo, \
         xmin_topo, xmax_topo, ymin_topo, ymax_topo = read_surfer_grd(topography_file)
@@ -69,18 +82,18 @@ def main():
     print(f"\nUsing grid spacing: {dx/1000:.2f} x {dy/1000:.2f} km")
     
     # Analysis parameters - Mars parameters
-    print("\n" + "="*80)
+    print("\n")
     print("ANALYSIS PARAMETERS")
-    print("="*80)
-    print("Physical Parameters (Mars):")
+    print("."*20)
+    print("Physical Parameters:")
     print("  Crustal density: 2900 kg/m³")
     print("  Mantle density: 3500 kg/m³")
     print("  Gravity: 3.72 m/s²")
-    print("\nAnalysis Parameters:")
-    print("  Window size: 1000 km")
-    print("  Grid spacing: 20 km")
-    print("  Shift distance range: 20-80 km")
-    print("  Computational domain: 2000 km")
+    #print("\nAnalysis Parameters:")
+    #print("  Window size: 1000 km")
+    #print("  Grid spacing: 20 km")
+    #print("  Shift distance range: 20-80 km")
+    #print("  Computational domain: 2000 km")
     
     """
     # Single window analysis (entire domain)
@@ -110,9 +123,9 @@ def main():
     
     """
     # Moving window analysis
-    print("\n" + "="*80)
+    print("\n")
     print("MOVING WINDOW ANALYSIS")
-    print("="*80)
+    print("."*23)
     
    # use_moving_window = input("\nPerform moving window analysis? (y/n, default: y): ").lower()
     use_moving_window = 'y'
@@ -163,7 +176,7 @@ def main():
                     # Plot Te map
                     from visualization import plot_te_map
                     # We'll create a simple plot here
-                    viridis_with_bad = plt.cm.get_cmap('viridis').copy()
+                    viridis_with_bad = plt.colormaps.get_cmap('viridis') #plt.cm.get_cmap('viridis').copy()
                     viridis_with_bad.set_bad('lightgray')
                     
                     x_centers_km = result['x_centers'] * dx / 1000
@@ -187,6 +200,7 @@ def main():
             
             plt.tight_layout()
             plt.show(block=False)
+        """
         else:
             # Single shift distance analysis
             shift_distance = float(input(f"Shift distance (km, default: {shift_min/1000:.0f}): ") or f"{shift_min/1000:.0f}") * 1000
@@ -196,7 +210,7 @@ def main():
                 shift_distance=shift_distance,
                 Te_range=(Te_min, Te_max)
             )
-            
+        """ 
         # Plot Te map
         fig2 = plot_te_map(mw_results, X_topo, Y_topo)
         plt.show(block=False)
@@ -207,10 +221,13 @@ def main():
         mw_results_dict = None
     
     # Sensitivity analysis
-    print("\n" + "="*80)
     print("SENSITIVITY ANALYSIS")
-    print("="*80)
+    print("."*20)
     
+    inverter = ElasticThicknessInversion(dx=dx, dy=dy,
+                                        rho_load=2900, rho_m=3500, 
+                                        rho_infill=2900, g=3.72)
+
     use_sensitivity = input("\nPerform sensitivity analysis? (y/n, default: n): ").lower()
     if use_sensitivity == 'y':
         Te_values, rms_values = inverter.sensitivity_analysis(
@@ -221,57 +238,122 @@ def main():
         
         fig3 = plot_sensitivity(Te_values, rms_values)
         plt.show(block=False)
-    
+    """
     # Save results
-    print("\n" + "="*80)
-    print("SAVING RESULTS")
-    print("="*80)
+    print("\n")
+    print("SAVING RESULTS","."*15)
     
     output_folder = create_output_folder()
     
-    save_data = input(f"\nSave numerical results? (y/n, default: y): ").lower()
-    if save_data != 'n':
-        save_dict = {
+    save_dict = {
             'topography': topography,
             'moho_depth': moho_depth,
             'X': X_topo,
             'Y': Y_topo,
-            'Te_best': result['Te_best'],
-            'rms_best': result['rms_best'],
-            'moho_predicted': result['moho_pred']
+         #   'Te_best': result['Te_best'],
+         #   'rms_best': result['rms_best'],
+         #   'moho_predicted': result['moho_pred']
         }
         
         # Save multiple shift results if available
-        if mw_results_dict is not None:
+    if mw_results_dict is not None:
             for shift_dist, result in mw_results_dict.items():
                 save_dict[f'Te_map_shift_{int(shift_dist/1000)}km'] = result['Te_map']
                 save_dict[f'rms_map_shift_{int(shift_dist/1000)}km'] = result['rms_map']
+    """
         elif mw_results is not None:
             save_dict['Te_map'] = mw_results['Te_map']
             save_dict['rms_map'] = mw_results['rms_map']
+        """
         
-        np.savez(os.path.join(output_folder, 'inversion_results.npz'), **save_dict)
-        print(f"Results saved to: {output_folder}/inversion_results.npz")
-    
+    np.savez(os.path.join(output_folder, 'inversion_results.npz'), **save_dict)
+    print(f"Results saved to: {output_folder}/inversion_results.npz")
+    """
     save_figures = input(f"\nSave figures? (y/n, default: y): ").lower()
+    
     if save_figures != 'n':
         try:
             fig1.savefig(os.path.join(output_folder, 'inversion_results.png'), dpi=300)
             print(f"Figure saved: {output_folder}/inversion_results.png")
         except Exception as e:
             print(f"Error saving figure: {e}")
-        
         if mw_results is not None:
             try:
                 fig2.savefig(os.path.join(output_folder, 'te_map.png'), dpi=300)
                 print(f"Figure saved: {output_folder}/te_map.png")
             except Exception as e:
                 print(f"Error saving figure: {e}")
+    """
+    if mw_results_dict is not None:
+            for shift_dist, result in mw_results_dict.items():
+                save_dict[f'Te_map_shift_{int(shift_dist/1000)}km'] = result['Te_map']
+                save_dict[f'rms_map_shift_{int(shift_dist/1000)}km'] = result['rms_map']
+    elif mw_results is not None:
+            save_dict['Te_map'] = mw_results['Te_map']
+            save_dict['rms_map'] = mw_results['rms_map']
+        
+    np.savez(os.path.join(output_folder, 'inversion_results.npz'), **save_dict)
+    print(f"Results saved to: {output_folder}/inversion_results.npz")
     
-    print("\n" + "="*80)
-    print("ANALYSIS COMPLETE")
-    print("="*80)
+    #save_figures = input(f"\nSave figures? (y/n, default: y): ").lower()
+   
+        
+    if mw_results is not None:
+            try:
+                fig2.savefig(os.path.join(output_folder, 'te_map.png'), dpi=300)
+                print(f"Figure saved: {output_folder}/te_map.png")
+            except Exception as e:
+                print(f"Error saving figure: {e}")
+    print("\n")
+    print("ANALYSIS COMPLETE","."*50)
     print(f"\nResults saved in: {output_folder}/")
+    
+    plt.show()
+    """
+    # Save results
+    print("\n")
+    print("SAVING RESULTS")
+    print("."*15)
+    
+    output_folder = create_output_folder()
+    
+    save_dict = {
+            'topography': topography,
+            'moho_depth': moho_depth,
+            'X': X_topo,
+            'Y': Y_topo,
+           # 'Te_best': result['Te_best'],
+           # 'rms_best': result['rms_best'],
+        #    'moho_predicted': result['moho_pred']#,
+        #    'Te_range_used': Te_range
+        }
+        
+        # Save multiple shift results if available
+    if mw_results_dict is not None:
+            for shift_dist, result in mw_results_dict.items():
+                save_dict[f'Te_map_shift_{int(shift_dist/1000)}km'] = result['Te_map']
+                save_dict[f'rms_map_shift_{int(shift_dist/1000)}km'] = result['rms_map']
+    elif mw_results is not None:
+            save_dict['Te_map'] = mw_results['Te_map']
+            save_dict['rms_map'] = mw_results['rms_map']
+        
+    np.savez(os.path.join(output_folder, 'inversion_results.npz'), **save_dict)
+    print(f"Results saved to: {output_folder}/inversion_results.npz")
+    
+    #save_figures = input(f"\nSave figures? (y/n, default: y): ").lower()
+   
+        
+    if mw_results is not None:
+            try:
+                fig2.savefig(os.path.join(output_folder, 'te_map.png'), dpi=300)
+                print(f"Figure saved: {output_folder}/te_map.png")
+            except Exception as e:
+                print(f"Error saving figure: {e}")
+    
+    print("\n")
+    print("ANALYSIS COMPLETE","."*50)
+    print(f"\nResults saved in: {output_folder}/")
+   # print(f"Te range used: {Te_range[0]/1000:.0f}-{Te_range[1]/1000:.0f} km (automatically determined)")
     
     # Keep plots open
     plt.show()

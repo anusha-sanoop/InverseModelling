@@ -76,7 +76,7 @@ def read_surfer_grd(filepath):
         print(f"  X range: {xmin/1000:.1f} to {xmax/1000:.1f} km")
         print(f"  Y range: {ymin/1000:.1f} to {ymax/1000:.1f} km")
         print(f"  Grid spacing: {dx/1000:.2f} x {dy/1000:.2f} km")
-        print(f"  Data range: {np.min(data):.2f} to {np.max(data):.2f}")
+       # print(f"  Data range: {np.min(data):.2f} to {np.max(data):.2f}")
         
         return X, Y, data, dx, dy, nx, ny, xmin, xmax, ymin, ymax
 

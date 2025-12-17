@@ -70,7 +70,7 @@ class MovingWindowAnalysis:
         print(f"  Window size: {window_size/1000:.0f} km ({window_pixels} pixels)")
         print(f"  Shift distance: {shift_distance/1000:.0f} km ({shift_pixels} pixels)")
         print(f"  Number of windows: {n_windows} ({len(x_positions)} x {len(y_positions)})")
-        print(f"  Te search range: {Te_range[0]/1000:.0f}-{Te_range[1]/1000:.0f} km (automatic)")
+      #  print(f"  Te search range: {Te_range[0]/1000:.0f}-{Te_range[1]/1000:.0f} km (automatic)")
         
         # Initialize result arrays
         Te_map = np.full((len(y_positions), len(x_positions)), np.nan)
@@ -105,7 +105,7 @@ class MovingWindowAnalysis:
                         # Perform inversion
                         result = inverter.invert_elastic_thickness(
                             topo_window, moho_window,
-                            Te_range=Te_range,
+                          #  Te_range=Te_range,
                             method='bounded'
                         )
                         
@@ -131,8 +131,8 @@ class MovingWindowAnalysis:
         valid_Te = Te_map[~np.isnan(Te_map)]
         if len(valid_Te) > 0:
             print(f"\n  Results: {len(valid_Te)} valid windows")
-            print(f"    Te range: {valid_Te.min()/1000:.1f} - {valid_Te.max()/1000:.1f} km")
-            print(f"    Te mean: {valid_Te.mean()/1000:.1f} ± {valid_Te.std()/1000:.1f} km")
+       #     print(f"    Te range: {valid_Te.min()/1000:.1f} - {valid_Te.max()/1000:.1f} km")
+       #     print(f"    Te mean: {valid_Te.mean()/1000:.1f} ± {valid_Te.std()/1000:.1f} km")
         else:
             print(f"\n  Warning: No valid windows found!")
         
@@ -182,13 +182,13 @@ class MovingWindowAnalysis:
         all_results = {}
         
         for shift_dist in shift_distances:
-            print(f"\n{'='*80}")
+            print(f"\n")
             print(f"Analyzing with shift distance: {shift_dist/1000:.0f} km")
-            print(f"{'='*80}")
+            print("."*38)
             result = self.analyze(topography, moho_depth, 
                                  window_size=window_size,
                                  shift_distance=shift_dist,
-                                 Te_range=Te_range,
+                            #     Te_range=Te_range,
                                  min_std_topo=min_std_topo,
                                  min_std_moho=min_std_moho)
             all_results[shift_dist] = result

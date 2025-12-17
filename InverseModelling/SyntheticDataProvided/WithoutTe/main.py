@@ -54,29 +54,40 @@ def determine_te_range(topography, moho_depth, dx, dy):
     print(f"\nAutomatically determined Te search range:")
     print(f"  Minimum Te: {Te_min/1000:.0f} km")
     print(f"  Maximum Te: {Te_max/1000:.0f} km")
-    print(f"  (No user input required)")
+   # print(f"  (No user input required)")
     
     return (Te_min, Te_max)
 
 
 def main():
     
-    topography_file = "D:\Marine\Project\InverseModelling\Test data_DRK\Large and small mount\MarsModel3TwoMountainsFar_1Topo_S20km.grd"
-    moho_file = "D:\Marine\Project\InverseModelling\Test data_DRK\Large and small mount\Mohod_depth_add30km_final_S20km.grd"
+    option = int(input(f"Press \t1. Synthetic data \t2. Real data: \t"))
+    if option == 1:
+        print("\n")
+        print("Synthetic Data")
+        print("."*15)
+        topography_file = "D:\\Marine\\Project\\InverseModelling\\Test data_DRK\\Large and small mount\\MarsModel3TwoMountainsFar_1Topo_S20km.grd"
+        moho_file = "D:\\Marine\\Project\\InverseModelling\\Test data_DRK\\Large and small mount\\Mohod_depth_add30km_final_S20km.grd"
+    elif option == 2:
+        print("\n")
+        print("Real Data")
+        print("."*10)
+        topography_file = "D:\\Marine\\Project\\InverseModelling\\Test data_DRK\\Real data\\Topo_proj.grd"
+        moho_file = "D:\\Marine\\Project\\InverseModelling\\Test data_DRK\\Real data\\Moho_Tc+Topo.grd"
+    else:
+        print("Invalid option selected. Exiting.")
+        return
     
     if not os.path.exists(topography_file):
         print(f"\nERROR: Topography file not found: {topography_file}")
-        print("Please update the 'topography_file' variable in main.py")
         return
     
     if not os.path.exists(moho_file):
         print(f"\nERROR: Moho file not found: {moho_file}")
-        print("Please update the 'moho_file' variable in main.py")
         return
     
-    print("\n" + "="*80)
-    print("LOADING DATA")
-    print("="*80)
+    print("\n")
+    print("LOADING DATA","."*50)
     
     X_topo, Y_topo, topography, dx_topo, dy_topo, nx_topo, ny_topo, \
         xmin_topo, xmax_topo, ymin_topo, ymax_topo = read_surfer_grd(topography_file)
@@ -93,24 +104,24 @@ def main():
     dx = dx_topo
     dy = dy_topo
     
-    print(f"\nUsing grid spacing: {dx/1000:.2f} x {dy/1000:.2f} km")
+   # print(f"\nUsing grid spacing: {dx/1000:.2f} x {dy/1000:.2f} km")
     
     # Automatically determine Te range
-    Te_range = determine_te_range(topography, moho_depth, dx, dy)
+    #Te_range = determine_te_range(topography, moho_depth, dx, dy)
     
-    print("\n" + "="*80)
+    print("\n")
     print("ANALYSIS PARAMETERS")
-    print("="*80)
-    print("Physical Parameters (Mars):")
+    print("."*20)
+    print("Physical Parameters:")
     print("  Crustal density: 2900 kg/m³")
     print("  Mantle density: 3500 kg/m³")
     print("  Gravity: 3.72 m/s²")
-    print("\nAnalysis Parameters:")
-    print("  Window size: 1000 km")
-    print("  Grid spacing: 20 km")
-    print("  Shift distance range: 20-80 km")
-    print("  Computational domain: 2000 km")
-    print(f"  Te search range: {Te_range[0]/1000:.0f}-{Te_range[1]/1000:.0f} km (AUTOMATIC)")
+   # print("\nAnalysis Parameters:")
+   # print("  Window size: 1000 km")
+   # print("  Grid spacing: 20 km")
+   # print("  Shift distance range: 20-80 km")
+   # print("  Computational domain: 2000 km")
+  #  print(f"  Te search range: {Te_range[0]/1000:.0f}-{Te_range[1]/1000:.0f} km (AUTOMATIC)")
     
     """
     print("\n" + "="*80)
@@ -140,9 +151,9 @@ def main():
     
     """
     # Moving window analysis
-    print("\n" + "="*80)
+    print("\n")
     print("MOVING WINDOW ANALYSIS")
-    print("="*80)
+    print("."*23)
     
     """
     use_moving_window = input("\nPerform moving window analysis? (y/n, default: y): ").lower()
@@ -240,7 +251,8 @@ def main():
     print(f"\nUsing parameters:")
     print(f"  Window size: {window_size/1000:.0f} km")
     print(f"  Shift distance range: {shift_min/1000:.0f}-{shift_max/1000:.0f} km (step: {shift_step/1000:.0f} km)")
-    print(f"  Te search range: {Te_range[0]/1000:.0f}-{Te_range[1]/1000:.0f} km (AUTOMATIC - no input required)")
+    print(f"  Computational domain: 2000 km")
+   # print(f"  Te search range: {Te_range[0]/1000:.0f}-{Te_range[1]/1000:.0f} km (AUTOMATIC - no input required)")
         
     
         
@@ -253,7 +265,7 @@ def main():
                 shift_min=shift_min,
                 shift_max=shift_max,
                 shift_step=shift_step,
-                Te_range=Te_range  # Use automatically determined range
+           #     Te_range=Te_range  
             )
             
             # Use the first shift distance result for plotting
@@ -269,7 +281,7 @@ def main():
     for idx, shift_dist in enumerate(shift_keys):
                 if idx < axes.shape[1]:
                     result = mw_results_dict[shift_dist]
-                    viridis_with_bad = plt.cm.get_cmap('viridis').copy()
+                    viridis_with_bad = plt.colormaps.get_cmap('viridis') #plt.cm.get_cmap('viridis').copy()
                     viridis_with_bad.set_bad('lightgray')
                     
                     x_centers_km = result['x_centers'] * dx / 1000
@@ -314,57 +326,49 @@ def main():
         plt.show(block=False)
     """
     # Save results
-    print("\n" + "="*80)
+    print("\n")
     print("SAVING RESULTS")
-    print("="*80)
+    print("."*15)
     
     output_folder = create_output_folder()
     
-    save_data = input(f"\nSave numerical results? (y/n, default: y): ").lower()
-    if save_data != 'n':
-        save_dict = {
+    save_dict = {
             'topography': topography,
             'moho_depth': moho_depth,
             'X': X_topo,
             'Y': Y_topo,
            # 'Te_best': result['Te_best'],
            # 'rms_best': result['rms_best'],
-            'moho_predicted': result['moho_pred'],
-            'Te_range_used': Te_range
+        #    'moho_predicted': result['moho_pred']#,
+        #    'Te_range_used': Te_range
         }
         
         # Save multiple shift results if available
-        if mw_results_dict is not None:
+    if mw_results_dict is not None:
             for shift_dist, result in mw_results_dict.items():
                 save_dict[f'Te_map_shift_{int(shift_dist/1000)}km'] = result['Te_map']
                 save_dict[f'rms_map_shift_{int(shift_dist/1000)}km'] = result['rms_map']
-        elif mw_results is not None:
+    elif mw_results is not None:
             save_dict['Te_map'] = mw_results['Te_map']
             save_dict['rms_map'] = mw_results['rms_map']
         
-        np.savez(os.path.join(output_folder, 'inversion_results.npz'), **save_dict)
-        print(f"Results saved to: {output_folder}/inversion_results.npz")
+    np.savez(os.path.join(output_folder, 'inversion_results.npz'), **save_dict)
+    print(f"Results saved to: {output_folder}/inversion_results.npz")
     
-    save_figures = input(f"\nSave figures? (y/n, default: y): ").lower()
-    if save_figures != 'n':
-        try:
-            fig1.savefig(os.path.join(output_folder, 'inversion_results.png'), dpi=300)
-            print(f"Figure saved: {output_folder}/inversion_results.png")
-        except Exception as e:
-            print(f"Error saving figure: {e}")
+    #save_figures = input(f"\nSave figures? (y/n, default: y): ").lower()
+   
         
-        if mw_results is not None:
+    if mw_results is not None:
             try:
                 fig2.savefig(os.path.join(output_folder, 'te_map.png'), dpi=300)
                 print(f"Figure saved: {output_folder}/te_map.png")
             except Exception as e:
                 print(f"Error saving figure: {e}")
     
-    print("\n" + "="*80)
-    print("ANALYSIS COMPLETE")
-    print("="*80)
+    print("\n")
+    print("ANALYSIS COMPLETE","."*50)
     print(f"\nResults saved in: {output_folder}/")
-    print(f"Te range used: {Te_range[0]/1000:.0f}-{Te_range[1]/1000:.0f} km (automatically determined)")
+   # print(f"Te range used: {Te_range[0]/1000:.0f}-{Te_range[1]/1000:.0f} km (automatically determined)")
     
     # Keep plots open
     plt.show()

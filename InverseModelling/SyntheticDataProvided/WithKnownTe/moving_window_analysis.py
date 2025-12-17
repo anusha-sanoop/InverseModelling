@@ -181,9 +181,9 @@ class MovingWindowAnalysis:
         all_results = {}
         
         for shift_dist in shift_distances:
-            print(f"\n{'='*80}")
+            print(f"\n")
             print(f"Analyzing with shift distance: {shift_dist/1000:.0f} km")
-            print(f"{'='*80}")
+            print("."*38)
             result = self.analyze(topography, moho_depth, 
                                  window_size=window_size,
                                  shift_distance=shift_dist,
