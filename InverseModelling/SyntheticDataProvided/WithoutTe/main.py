@@ -66,14 +66,19 @@ def main():
         print("\n")
         print("Synthetic Data")
         print("."*15)
-        topography_file = "D:\\Marine\\Project\\InverseModelling\\Test data_DRK\\Large and small mount\\MarsModel3TwoMountainsFar_1Topo_S20km.grd"
-        moho_file = "D:\\Marine\\Project\\InverseModelling\\Test data_DRK\\Large and small mount\\Mohod_depth_add30km_final_S20km.grd"
+       #  topography_file = "D:\\Marine\\Project\\InverseModelling\\Test data_DRK\\Large and small mount\\MarsModel3TwoMountainsFar_1Topo_S20km.grd"
+      #  moho_file = "D:\\Marine\\Project\\InverseModelling\\Test data_DRK\\Large and small mount\\Mohod_depth_add30km_final_S20km.grd"
+        topography_file = "D:\\PhD\\Marine\\Projects\\SyntheticData\\InverseModelling\\Test data_DRK\\Large and small mount\\MarsModel3TwoMountainsFar_1Topo_S20km.grd"
+        moho_file = "D:\\PhD\\Marine\\Projects\\SyntheticData\\InverseModelling\\Test data_DRK\\Large and small mount\\Mohod_depth_add30km_final_S20km.grd"
+    
     elif option == 2:
         print("\n")
         print("Real Data")
         print("."*10)
-        topography_file = "D:\\Marine\\Project\\InverseModelling\\Test data_DRK\\Real data\\Topo_proj.grd"
-        moho_file = "D:\\Marine\\Project\\InverseModelling\\Test data_DRK\\Real data\\Moho_Tc+Topo.grd"
+        # topography_file = "D:\\Marine\\Project\\InverseModelling\\Test data_DRK\\Real data\\Topo_proj.grd"
+        # moho_file = "D:\\Marine\\Project\\InverseModelling\\Test data_DRK\\Real data\\Moho_Tc+Topo.grd"
+        topography_file = "D:\\PhD\\Marine\\Projects\\SyntheticData\\InverseModelling\\Test data_DRK\\Real data\\Topo_proj.grd"
+        moho_file = "D:\\PhD\\Marine\\Projects\\SyntheticData\\InverseModelling\\Test data_DRK\\Real data\\Moho_Tc+Topo.grd"
     else:
         print("Invalid option selected. Exiting.")
         return
